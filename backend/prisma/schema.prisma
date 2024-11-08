@@ -1,0 +1,198 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// User model with specific roles for resident, tradesperson, and maintenance engineer
+model User {
+  id        String   @id @default(uuid())
+  firstName String
+  lastName  String
+  email     String   @unique
+  phone     String?
+  role      UserRole
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  resident            Resident?            @relation("ResidentUser")
+  tradesperson        Tradesperson?        @relation("TradespersonUser")
+  maintenanceEngineer MaintenanceEngineer? @relation("MaintenanceUser")
+
+  notifications Notification[]
+
+  @@index([role])
+  @@index([email])
+}
+
+// Resident model with multiple FaultReports
+model Resident {
+  userId       String        @id
+  street       String?
+  city         String?
+  state        String?
+  postalCode   String?
+  country      String?
+  latitude     Float?
+  longitude    Float?
+  user         User          @relation("ResidentUser", fields: [userId], references: [id], onDelete: Cascade)
+  faultReports FaultReport[]
+
+  @@index([postalCode])
+  @@index([city])
+}
+
+// Tradesperson model with multiple Bookings
+model Tradesperson {
+  userId                  String    @id
+  trade                   TradeType
+  qualification           String
+  verifyQualificationId   String
+  qualificationVerifiedAt DateTime?
+  yearsExperience         Float?
+  companyName             String
+  companyContact          String?
+  street                  String?
+  city                    String?
+  state                   String?
+  postalCode              String?
+  country                 String?
+  latitude                Float?
+  longitude               Float?
+  user                    User      @relation("TradespersonUser", fields: [userId], references: [id], onDelete: Cascade)
+  bookings                Booking[]
+
+  @@index([postalCode])
+  @@index([city])
+  @@index([trade])
+}
+
+// MaintenanceEngineer model with multiple FaultReports and Bookings
+model MaintenanceEngineer {
+  userId                  String        @id
+  department              String
+  qualification           String
+  verifyQualificationId   String
+  qualificationVerifiedAt DateTime?
+  companyName             String
+  companyContact          String?
+  yearsExperience         Float?
+  street                  String?
+  city                    String?
+  state                   String?
+  postalCode              String?
+  country                 String?
+  latitude                Float?
+  longitude               Float?
+  user                    User          @relation("MaintenanceUser", fields: [userId], references: [id], onDelete: Cascade)
+  faultReports            FaultReport[]
+  bookings                Booking[]
+
+  @@index([postalCode])
+  @@index([city])
+}
+
+// FaultReport model without 'bookingId'
+model FaultReport {
+  id          String      @id @default(uuid())
+  residentId  String
+  engineerId  String?
+  description String
+  mediaUrl    String?
+  mediaFile   String?
+  status      FaultStatus @default(PENDING)
+  bookingDate DateTime?
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  resident Resident             @relation(fields: [residentId], references: [userId])
+  engineer MaintenanceEngineer? @relation(fields: [engineerId], references: [userId])
+  booking  Booking?             @relation("FaultReportBooking") // Relation without fields and references
+  survey   Survey?
+
+  @@index([createdAt])
+}
+
+// Booking model with both engineerId and tradespersonId
+model Booking {
+  id             String        @id @default(uuid())
+  faultReportId  String        @unique // Ensures unique relation for one-to-one with FaultReport
+  engineerId     String? // Optional link to MaintenanceEngineer
+  tradespersonId String? // Optional link to Tradesperson
+  date           DateTime
+  status         BookingStatus
+  createdAt      DateTime      @default(now())
+
+  faultReport  FaultReport          @relation("FaultReportBooking", fields: [faultReportId], references: [id])
+  engineer     MaintenanceEngineer? @relation(fields: [engineerId], references: [userId])
+  tradesperson Tradesperson?        @relation(fields: [tradespersonId], references: [userId])
+
+  @@index([date])
+}
+
+// Survey model with expanded feedback fields
+model Survey {
+  id                   String   @id @default(uuid())
+  faultReportId        String   @unique
+  serviceQualityRating Int
+  responseTimeRating   Int
+  comments             String?
+  createdAt            DateTime @default(now())
+
+  faultReport FaultReport @relation(fields: [faultReportId], references: [id])
+}
+
+// Notification model with notification type for better organization
+model Notification {
+  id        String           @id @default(uuid())
+  userId    String
+  type      NotificationType
+  message   String
+  isRead    Boolean          @default(false)
+  createdAt DateTime         @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+}
+
+// Enums
+enum UserRole {
+  RESIDENT
+  TRADESPERSON
+  MAINTENANCE_ENGINEER
+}
+
+enum NotificationType {
+  FAULT_UPDATE
+  BOOKING_REMINDER
+  SURVEY_INVITE
+}
+
+enum FaultStatus {
+  PENDING
+  UNDER_REVIEW
+  NEEDS_REPAIR
+  IN_PROGRESS
+  ESCALATED
+  ON_HOLD
+  CANCELED
+  RESOLVED
+}
+
+enum BookingStatus {
+  SCHEDULED
+  RESCHEDULED
+  ON_HOLD
+  COMPLETED
+  CANCELED
+}
+
+enum TradeType {
+  HANDYPERSON
+  PLUMBER
+  ELECTRICIAN
+  CARPENTER
+  PAINTER
+}
