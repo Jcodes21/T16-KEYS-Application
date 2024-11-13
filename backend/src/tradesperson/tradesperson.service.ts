@@ -1,48 +1,43 @@
 // src/tradesperson/tradesperson.service.ts
 import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { Tradesperson } from './tradesperson.entity';
+import { Resident } from '../resident/resident.entity'; // Import Resident entity
+import { calculateDistance } from '../utils/distance.helper'; // Helper function
 
 @Injectable()
 export class TradespersonService {
-  private tradespeople: Tradesperson[] = [];
+  constructor(
+    @InjectRepository(Tradesperson)
+    private readonly tradespersonRepository: Repository<Tradesperson>,
+    @InjectRepository(Resident)
+    private readonly residentRepository: Repository<Resident>, // Inject Resident repository
+  ) {}
 
-  // Create a new tradesperson
-  create(
-    name: string,
-    trade: string,
-    qualifications: string,
-    company: string,
-    contact: string,
-    available: boolean
-  ): Tradesperson {
-    const tradesperson = new Tradesperson(name, trade, qualifications, company, contact, available);
-    this.tradespeople.push(tradesperson);
-    return tradesperson;
-  }
-
-  // Find all tradespeople
-  findAll(): Tradesperson[] {
-    return this.tradespeople;
-  }
-
-  // Find tradespeople by trade type
-  findByTrade(trade: string): Tradesperson[] {
-    return this.tradespeople.filter(t => t.trade === trade);
-  }
-
-  // Find a single tradesperson by ID (returning null if not found)
-  findOne(id: number): Tradesperson | null {
-    const tradesperson = this.tradespeople.find(t => t.id === id);
-    return tradesperson || null; // Return null if not found
-  }
-
-  // Update a tradesperson's availability (returning null if not found)
-  updateAvailability(id: number, available: boolean): Tradesperson | null {
-    const tradesperson = this.tradespeople.find(t => t.id === id);
-    if (tradesperson) {
-      tradesperson.available = available;
-      return tradesperson;
+  // Find tradespeople within a 2km radius of a resident
+  async findNearbyTradespeople(residentId: string): Promise<Tradesperson[]> {
+    const resident = await this.residentRepository.findOne(residentId);
+    if (!resident || !resident.latitude || !resident.longitude) {
+      throw new Error('Resident location not found');
     }
-    return null; // Return null if not found
+
+    // Get all available tradespeople
+    const tradespeople = await this.tradespersonRepository.find({ where: { available: true } });
+
+    // Filter tradespeople within 2km radius
+    const nearbyTradespeople = tradespeople.filter((tradesperson) => {
+      const distance = calculateDistance(
+        resident.latitude,
+        resident.longitude,
+        tradesperson.latitude,
+        tradesperson.longitude,
+      );
+      return distance <= 2; // 2km radius
+    });
+
+    return nearbyTradespeople;
   }
+
+  // Other existing methods like create, findAll, etc.
 }

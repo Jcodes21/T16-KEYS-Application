@@ -1,26 +1,26 @@
-import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
+import { Entity, Column } from 'typeorm';
+import { BaseEntity } from '../shared/base.entity'; // Import BaseEntity
 
-@Entity('users') // The name of the table will be 'users'
-export class User {
-  @PrimaryGeneratedColumn()
-  id!: number; // Primary key, automatically generated
+export enum UserRole {
+  RESIDENT = 'RESIDENT',
+  TRADESPERSON = 'TRADESPERSON',
+  MAINTENANCE_ENGINEER = 'MAINTENANCE_ENGINEER',
+}
+
+@Entity('users')
+export class User extends BaseEntity {  // Inherit from BaseEntity
+  @Column()
+  first_name!: string;  // First name of the user
 
   @Column()
-  name: string;
+  last_name!: string;  // Last name of the user
 
   @Column()
-  email: string;
+  email!: string;  // Email of the user
 
-  @Column()
-  password: string;
+  @Column({ type: 'enum', enum: UserRole, default: UserRole.RESIDENT })
+  role!: UserRole;  // Role of the user (Resident, Tradesperson, or Maintenance Engineer)
 
   @Column({ default: true })
-  active: boolean; // User active status, default to true
-
-  constructor(name: string, email: string, password: string, active: boolean = true) {
-    this.name = name;
-    this.email = email;
-    this.password = password;
-    this.active = active;
-  }
+  active!: boolean;  // Whether the user is active or not
 }
