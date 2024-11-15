@@ -1,27 +1,24 @@
+// src/user/user.service.ts
 import { Injectable } from '@nestjs/common';
-
-// Mock User data
-let users = [];
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { User } from './user.entity';
 
 @Injectable()
 export class UserService {
+  constructor(
+    @InjectRepository(User) // Injecting User repository
+    private readonly userRepository: Repository<User>,
+  ) {}
+
   // Create a new user
-  create(userData: { first_name: string; last_name: string; email: string; role: string }) {
-    const newUser = { id: Date.now().toString(), ...userData };
-    users.push(newUser);
-    return newUser;
+  async create(userData: Partial<User>): Promise<User> {
+    const newUser = this.userRepository.create(userData); // Create a new user entity instance
+    return this.userRepository.save(newUser); // Save the new user instance in the database
   }
 
   // Get user by ID
-  getUserById(id: string) {
-    const user = users.find((user) => user.id === id);
-    if (!user) {
-      throw new Error('User not found');
-    }
-    return user;
-  }
-
-  getTestMessage() {
-    return { message: 'User service is working!' };
+  async getUserById(id: number): Promise<User | null> {
+    return this.userRepository.findOne({ where: { id } }); // Find user by ID
   }
 }

@@ -1,19 +1,16 @@
-import { Controller, Get, Post, Body, Param } from '@nestjs/common';
+// src/user/user.controller.ts
+import { Controller, Get, Param } from '@nestjs/common';
 import { UserService } from './user.service';
+import { User } from './user.entity';
 
-@Controller('user')
+@Controller('users')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-  // Create a new user
-  @Post()
-  create(@Body() userData: { first_name: string; last_name: string; email: string; role: string }) {
-    return this.userService.create(userData);
-  }
-
   // Get user by ID
   @Get(':id')
-  getUser(@Param('id') id: string) {
-    return this.userService.getUserById(id);
+  async getUserById(@Param('id') id: string): Promise<User | null> {
+    const numericId = parseInt(id, 10); // Convert id to a number
+    return this.userService.getUserById(numericId); // Pass as a number
   }
 }

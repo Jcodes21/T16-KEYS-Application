@@ -1,15 +1,10 @@
-import { Controller, Dependencies, Get } from '@nestjs/common';
-import { AppService } from './app.service';
+// src/app.controller.ts
+import { Controller, Get } from '@nestjs/common';
 
 @Controller()
-@Dependencies(AppService)
 export class AppController {
-  constructor(appService) {
-    this.appService = appService;
-  }
-
   @Get()
-  getHello() {
-    return this.appService.getHello();
+  getHello(): string {
+    return 'Welcome to the BACKEND Of the KEYS Application!';
   }
 }

@@ -1,5 +1,5 @@
-import { Entity, Column } from 'typeorm';
-import { BaseEntity } from '../shared/base.entity'; // Import BaseEntity
+import { Entity, Column, OneToMany, BaseEntity, PrimaryGeneratedColumn } from 'typeorm';
+//import { Notification } from '../notification/notification.entity';
 
 export enum UserRole {
   RESIDENT = 'RESIDENT',
@@ -8,19 +8,27 @@ export enum UserRole {
 }
 
 @Entity('users')
-export class User extends BaseEntity {  // Inherit from BaseEntity
-  @Column()
-  first_name!: string;  // First name of the user
+export class User extends BaseEntity {
+  @PrimaryGeneratedColumn() // Automatically generates a unique identifier
+  id!: number;
 
   @Column()
-  last_name!: string;  // Last name of the user
+  first_name!: string;
 
   @Column()
-  email!: string;  // Email of the user
+  last_name!: string;
+
+  @Column({ unique: true })
+  email!: string;
 
   @Column({ type: 'enum', enum: UserRole, default: UserRole.RESIDENT })
-  role!: UserRole;  // Role of the user (Resident, Tradesperson, or Maintenance Engineer)
+  role!: UserRole;
 
   @Column({ default: true })
-  active!: boolean;  // Whether the user is active or not
-}
+  active!: boolean;
+
+  //@OneToMany(() => Notification, (notification) => notification.user, {
+    //cascade: true, // Automatically saves related notifications
+  }
+//  notifications!: Notification[];
+

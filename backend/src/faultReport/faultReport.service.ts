@@ -1,39 +1,65 @@
-// src/fault-report/fault-report.service.ts
-import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm'; // This is still needed to inject the repository
-import { Repository } from 'typeorm';
-import { FaultReport } from './fault-report.entity';  // Import FaultReport entity
+// import { Injectable } from '@nestjs/common';
+// import { InjectRepository } from '@nestjs/typeorm';
+// import { Repository } from 'typeorm';
+// import { FaultReport, FaultStatus } from './faultReport.entity';
+// import { Resident } from '../resident/resident.entity';
 
-@Injectable()
-export class FaultReportService {
-  constructor(
-    @InjectRepository(FaultReport)
-    private readonly faultReportRepository: Repository<FaultReport>, // Inject the repository here
-  ) {}
+// @Injectable()
+// export class FaultReportService {
+//   constructor(
+//     @InjectRepository(FaultReport)
+//     private readonly faultReportRepository: Repository<FaultReport>,
+//     @InjectRepository(Resident)
+//     private readonly residentRepository: Repository<Resident>,
+//   ) {}
 
-  // Create a new Fault Report
-  async create(description: string, residentId: string): Promise<FaultReport> {
-    const newFaultReport = this.faultReportRepository.create({
-      description,
-      resident: { id: residentId }, // Assume there's a relationship with Resident
-      created_at: new Date(),
-    });
-    return this.faultReportRepository.save(newFaultReport);
-  }
+//   // Method to find a resident by their ID
+//   async findResidentById(residentId: number): Promise<Resident | null> {
+//     const resident = await this.residentRepository.findOne({
+//       where: { id: residentId },
+//     });
+//     if (!resident) {
+//       throw new Error('Resident not found');
+//     }
+//     return resident;
+//   }
 
-  // Find all Fault Reports
-  async findAll(): Promise<FaultReport[]> {
-    return this.faultReportRepository.find();
-  }
+//   // Method to create a new fault report
+//   async createFaultReport(
+//     residentId: number,
+//     description: string,
+//     status: FaultStatus = FaultStatus.PENDING,
+//   ): Promise<FaultReport> {
+//     const resident = await this.findResidentById(residentId);
 
-  // Find a specific Fault Report by ID
-  async findOne(id: string): Promise<FaultReport | null> {
-    return this.faultReportRepository.findOne(id);
-  }
+//     if (!resident) {
+//       throw new Error('Resident not found');
+//     }
 
-  // Update the status of a Fault Report
-  async updateStatus(id: string, status: string): Promise<FaultReport | null> {
-    await this.faultReportRepository.update(id, { status, updated_at: new Date() });
-    return this.findOne(id);
-  }
-}
+//     const faultReport = this.faultReportRepository.create({
+//       resident,
+//       description,
+//       status,
+//     });
+
+//     return this.faultReportRepository.save(faultReport);
+//   }
+
+//   // Method to get a fault report by ID
+//   async findFaultReportById(id: number): Promise<FaultReport | null> {
+//     return this.faultReportRepository.findOne({
+//       where: { id },
+//       relations: ['resident'],
+//     });
+//   }
+
+//   // Method to update a fault report by ID
+//   async updateFaultReportStatus(id: number, status: FaultStatus): Promise<FaultReport | null> {
+//     const faultReport = await this.findFaultReportById(id);
+//     if (!faultReport) {
+//       throw new Error('Fault report not found');
+//     }
+//     faultReport.status = status;
+//     return this.faultReportRepository.save(faultReport);
+//   }
+// }

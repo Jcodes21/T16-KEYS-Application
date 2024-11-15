@@ -1,54 +1,44 @@
 // src/resident/resident.service.ts
-import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { Repository } from 'typeorm';
-import { Resident } from './resident.entity';  // Import the Resident entity
+import { InjectRepository } from '@nestjs/typeorm';
+import { Resident } from './resident.entity';
+//mport { CreateResidentDto } from './dto/create-resident.dto';
+//import { UpdateResidentDto } from './dto/update-resident.dto';
 
 @Injectable()
 export class ResidentService {
   constructor(
     @InjectRepository(Resident)
-    private readonly residentRepository: Repository<Resident>,  // Inject TypeORM Repository
+    private readonly residentRepository: Repository<Resident>,
   ) {}
 
   // Create a new resident
-  async create(
-    name: string,
-    street: string,
-    city: string,
-    state: string,
-    postal_code: string,
-    country: string,
-    latitude: number,
-    longitude: number,
-  ): Promise<Resident> {
-    const resident = this.residentRepository.create({
-      name,
-      street,
-      city,
-      state,
-      postal_code,
-      country,
-      latitude,
-      longitude,
-    }); // Create a new Resident entity
-
-    return this.residentRepository.save(resident); // Save it to the database
-  }
+  // async create(createResidentDto: CreateResidentDto): Promise<Resident> {
+  //   const resident = this.residentRepository.create(createResidentDto);
+  //   return this.residentRepository.save(resident);
+  // }
 
   // Find all residents
-  async findAll(): Promise<Resident[]> {
-    return this.residentRepository.find();  // Fetch all residents from the DB
-  }
+  // async findAll(): Promise<Resident[]> {
+  //   return this.residentRepository.find();
+  // }
 
-  // Find a resident by ID
-  async findOne(id: string): Promise<Resident | null> {
-    return this.residentRepository.findOne(id);  // Find a resident by ID
-  }
+  // Find one resident by ID
+  // async findOne(id: string): Promise<Resident> {
+  //   const numericId = parseInt(id, 10); // Convert id to a number
 
-  // Update a resident's information (e.g., address)
-  async update(id: string, updateData: Partial<Resident>): Promise<Resident | null> {
-    await this.residentRepository.update(id, updateData);  // Update resident info
-    return this.findOne(id);  // Return the updated resident
-  }
+  //   const resident = await this.residentRepository.findOne({ where: { id: numericId } });
+  //   if (!resident) {
+  //     throw new NotFoundException(`Resident with ID ${id} not found`);
+  //   }
+  //   return resident;
+  // }
+
+  // Update a resident by ID
+  // async update(id: string, updateResidentDto: UpdateResidentDto): Promise<Resident> {
+  //   const resident = await this.findOne(id);
+  //   Object.assign(resident, updateResidentDto);
+  //   return this.residentRepository.save(resident);
+  // }
 }

@@ -4,7 +4,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Tradesperson } from './tradesperson.entity';
 import { Resident } from '../resident/resident.entity'; // Import Resident entity
-import { calculateDistance } from '../utils/distance.helper'; // Helper function
+import { calculateDistance } from '../util/distance.helper'; // Helper function
 
 @Injectable()
 export class TradespersonService {
@@ -16,14 +16,22 @@ export class TradespersonService {
   ) {}
 
   // Find tradespeople within a 2km radius of a resident
+  /*
   async findNearbyTradespeople(residentId: string): Promise<Tradesperson[]> {
-    const resident = await this.residentRepository.findOne(residentId);
+    // Convert residentId to a number
+    const numericResidentId = parseInt(residentId, 10);
+
+    const resident = await this.residentRepository.findOne({
+      where: { id: numericResidentId },
+    });
     if (!resident || !resident.latitude || !resident.longitude) {
       throw new Error('Resident location not found');
     }
 
     // Get all available tradespeople
-    const tradespeople = await this.tradespersonRepository.find({ where: { available: true } });
+    const tradespeople = await this.tradespersonRepository.find({
+      where: { available: true },
+    });
 
     // Filter tradespeople within 2km radius
     const nearbyTradespeople = tradespeople.filter((tradesperson) => {
@@ -38,6 +46,7 @@ export class TradespersonService {
 
     return nearbyTradespeople;
   }
+  */
 
   // Other existing methods like create, findAll, etc.
 }

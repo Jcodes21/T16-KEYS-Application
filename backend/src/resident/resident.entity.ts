@@ -1,9 +1,10 @@
-// src/resident/resident.entity.ts
-import { Entity, Column } from 'typeorm';
-import { User } from '../user/user.entity';  // Import User entity
+import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
 
 @Entity('residents')
-export class Resident extends User {  // Inherit from User entity
+export class Resident {
+  @PrimaryGeneratedColumn('uuid') // Ensure the UUID is generated for the primary key
+  id: string;
+
   @Column({ type: 'varchar', nullable: true })
   street!: string;
 

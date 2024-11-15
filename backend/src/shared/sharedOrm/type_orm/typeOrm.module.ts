@@ -10,10 +10,10 @@ import { Tradesperson } from '../../../tradesperson/tradesperson.entity'; // Imp
       host: 'localhost',
       port: 5432,
       username: 'postgres',
-      password: 'password',
+      password: '',
       database: 'nestjs',
       entities: [User, Tradesperson], // Define your entities here
-      synchronize: true, // Automatically sync the DB (do not use in production)
+      synchronize: false, // Automatically sync the DB (do not use in production)
     }),
     TypeOrmModule.forFeature([User, Tradesperson]), // Makes entities available for injection in the module
   ],

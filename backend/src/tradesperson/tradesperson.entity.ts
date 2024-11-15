@@ -1,41 +1,50 @@
-import { Entity, Column } from 'typeorm';
-import { User } from '../user/user.entity'; // Import the User entity for inheritance
+// src/tradesperson/tradesperson.entity.ts
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn } from 'typeorm';
 
 @Entity('tradespeople')
-export class Tradesperson extends User {
-  @Column({ type: 'varchar', nullable: true })
-  trade!: string;  // The trade that the tradesperson specializes in (e.g., plumber, electrician)
+export class Tradesperson {
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
   @Column({ type: 'varchar', nullable: true })
-  qualifications!: string;  // Qualifications of the tradesperson
+  trade: string;
 
   @Column({ type: 'varchar', nullable: true })
-  company!: string;  // The company the tradesperson works for
+  qualifications: string;
 
   @Column({ type: 'varchar', nullable: true })
-  contact!: string;  // The contact information for the tradesperson/company
+  company: string;
+
+  @Column({ type: 'varchar', nullable: true })
+  contact: string;
 
   @Column({ type: 'boolean', default: true })
-  available!: boolean;  // Whether the tradesperson is available for work
+  available: boolean;
 
   @Column({ type: 'varchar', nullable: true })
-  street!: string;  // Street address (nullable)
+  street: string;
 
   @Column({ type: 'varchar', nullable: true })
-  city!: string;  // City (nullable)
+  city: string;
 
   @Column({ type: 'varchar', nullable: true })
-  state!: string;  // State (nullable)
+  state: string;
 
   @Column({ type: 'varchar', nullable: true })
-  postal_code!: string;  // Postal code (nullable)
+  postal_code: string;
 
   @Column({ type: 'varchar', nullable: true })
-  country!: string;  // Country (nullable)
+  country: string;
 
   @Column({ type: 'float', nullable: true })
-  latitude!: number;  // Latitude (nullable)
+  latitude: number;
 
   @Column({ type: 'float', nullable: true })
-  longitude!: number;  // Longitude (nullable)
+  longitude: number;
+
+  @CreateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+  created_at: Date;
+
+  @UpdateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+  updated_at: Date;
 }

@@ -1,12 +1,16 @@
+// src/booking/booking.module.ts
 import { Module } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm';  // Importing TypeOrmModule
-import { Booking } from './booking.entity';  // Import the Booking entity
-import { BookingService } from './booking.service';  // Import the Booking service
-import { BookingController } from './booking.controller';  // Import the Booking controller
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { BookingService } from './booking.service';
+import { BookingController } from './booking.controller';
+import { Booking } from './booking.entity';
+import { User } from '../user/user.entity'; // Import User entity
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Booking])],  // Import TypeOrmModule and configure the Booking repository
-  providers: [BookingService],  // Register the Booking service
-  controllers: [BookingController],  // Register the Booking controller
+  imports: [
+    TypeOrmModule.forFeature([Booking, User]) // Register Booking and User repositories
+  ],
+  providers: [BookingService],
+  controllers: [BookingController],
 })
 export class BookingModule {}

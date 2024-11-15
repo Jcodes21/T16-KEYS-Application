@@ -1,53 +1,70 @@
-import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';  // This is the correct import
-import { Repository } from 'typeorm';  // Importing from typeorm, as this will be injected through the shared module
-import { Booking } from './booking.entity';  // Import the Booking entity
-import { User } from '../user/user.entity';  // Import the User entity for referencing
+// src/booking/booking.service.ts
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { Booking } from './booking.entity';
+import { User } from '../user/user.entity';
+import { BookingStatus } from './booking.enum';
 
 @Injectable()
 export class BookingService {
   constructor(
-    @InjectRepository(Booking)  // Inject the repository for the Booking entity
-    private readonly bookingRepository: Repository<Booking>,  // This repository will be injected from the SharedOrmModule
+    @InjectRepository(Booking)
+    private readonly bookingRepository: Repository<Booking>,
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>, // Add user repository to fetch users
   ) {}
 
-  // Create a new booking
+  // Method to create a booking
   async create(
     date: Date,
-    status: string,
+    status: BookingStatus,
     residentId: string,
-    tradespersonId: string | null,
-    engineerId: string | null
+    tradespersonId?: string,
+    engineerId?: string
   ): Promise<Booking> {
+    // Fetch the full User entities by id
+    const resident = await this.userRepository.findOneBy({ id: parseInt(residentId) });
+    if (!resident) throw new NotFoundException(`Resident with ID ${residentId} not found`);
+
+    const tradesperson = tradespersonId
+      ? await this.userRepository.findOneBy({ id: parseInt(tradespersonId) })
+      : undefined;
+
+    const engineer = engineerId
+      ? await this.userRepository.findOneBy({ id: parseInt(engineerId) })
+      : undefined;
+
     const booking = this.bookingRepository.create({
       date,
       status,
-      resident: { id: residentId } as User,
-      tradesperson: tradespersonId ? { id: tradespersonId } as User : null,
-      engineer: engineerId ? { id: engineerId } as User : null,
-    });
-    return this.bookingRepository.save(booking);  // Save and return the created booking
+      resident,
+      tradesperson,
+      engineer,
+    } as Booking); // Explicitly casting to Booking to satisfy type requirements
+
+    return this.bookingRepository.save(booking);
   }
 
-  // Get all bookings
+  // Method to get all bookings
   async findAll(): Promise<Booking[]> {
-    return this.bookingRepository.find();  // Fetch all bookings from the DB
+    return this.bookingRepository.find();
   }
 
-  // Get a single booking by ID
+  // Method to find a single booking by ID
   async findOne(id: string): Promise<Booking | null> {
-    return this.bookingRepository.findOne(id);  // Find a booking by ID
+    return this.bookingRepository.findOneBy({ id: parseInt(id) as unknown as string });
   }
 
-  // Update booking status
-  async updateStatus(id: string, status: string): Promise<Booking | null> {
-    await this.bookingRepository.update(id, { status });
-    return this.findOne(id);  // Return the updated booking
+  // Method to update the booking status
+  async updateStatus(id: string, status: BookingStatus): Promise<Booking | null> {
+    await this.bookingRepository.update(parseInt(id), { status });
+    return this.findOne(id);
   }
 
-  // Reschedule a booking (update the date and time)
+  // Method to reschedule a booking
   async rescheduleBooking(id: string, newDate: Date): Promise<Booking | null> {
-    await this.bookingRepository.update(id, { date: newDate });
-    return this.findOne(id);  // Return the updated booking
+    await this.bookingRepository.update(parseInt(id), { date: newDate });
+    return this.findOne(id);
   }
 }

@@ -1,18 +1,41 @@
-// src/sharedOrm/sharedOrm.module.ts
 import { Module } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm'; // Import TypeOrmModule
-import { User } from '../../user/user.entity'; // Import User entity
-import { Tradesperson } from '../../tradesperson/tradesperson.entity'; // Import Tradesperson entity
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { User } from '../../user/user.entity';
+import { Tradesperson } from '../../tradesperson/tradesperson.entity';
+import { Resident } from '../../resident/resident.entity';
+import { Booking } from '../../booking/booking.entity';
+//import { Notification } from '../../notification/notification.entity';
+//import { MaintenanceEngineer } from '../../maintenanceEngineer/maintenanceEngineer.entity';
 
 @Module({
   imports: [
     TypeOrmModule.forRoot({
-      type: 'postgres',  // Change depending on your database (e.g., 'mysql', 'sqlite', etc.)
-      url: process.env.DATABASE_URL, // Get database URL from .env
-      entities: [User, Tradesperson], // List your entities
-      synchronize: true,  // Use migrations in production
+      type: 'postgres',
+      host: 'localhost',           // replace with actual host if different
+      port: 5432,                  // default PostgreSQL port
+      username: 'postgres',        // your database username
+      password: '',                // your database password
+      database: 'keys_db',         // your database name
+      entities: [
+        User,
+        Tradesperson,
+        Resident,
+        Booking,
+        //Notification,
+        //MaintenanceEngineer,
+      ],
+      synchronize: false,           // disable this in production
+      logging: true,
     }),
-    TypeOrmModule.forFeature([User, Tradesperson]), // Register entities here
+    TypeOrmModule.forFeature([
+      User,
+      Tradesperson,
+      Resident,
+      Booking,
+      //Notification,
+     // MaintenanceEngineer,
+    ]),
   ],
+  exports: [TypeOrmModule],        // Export TypeOrmModule for usage in other modules
 })
 export class SharedOrmModule {}

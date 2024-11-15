@@ -1,12 +1,13 @@
-// src/resident/resident.module.ts
 import { Module } from '@nestjs/common';
+import { TypeOrmModule } from '@nestjs/typeorm'; // Import TypeOrmModule
 import { ResidentController } from './resident.controller';
 import { ResidentService } from './resident.service';
-import { SharedOrmModule } from '../shared/sharedOrm/sharedOrm.module';  // Import SharedOrmModule here
+import { Resident } from './resident.entity'; // Import Resident entity
 
 @Module({
-  imports: [SharedOrmModule],  // Use the shared module for database access
+  imports: [TypeOrmModule.forFeature([Resident])], // Register Resident entity with TypeOrmModule
   controllers: [ResidentController],
   providers: [ResidentService],
+  exports: [ResidentService], // Export if needed in other modules
 })
 export class ResidentModule {}

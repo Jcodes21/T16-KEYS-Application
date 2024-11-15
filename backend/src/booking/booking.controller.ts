@@ -1,6 +1,9 @@
 import { Controller, Get, Post, Body, Param, Put } from '@nestjs/common';
 import { BookingService } from './booking.service';
 import { Booking } from './booking.entity';
+import { BookingStatus } from './booking.enum'; // Import BookingStatus enum
+import { CreateBookingDto } from './dto/create-booking.dto'; // Create a separate DTO file
+import { UpdateStatusDto } from './dto/update-status.dto'; // Separate DTO for status update
 
 @Controller('bookings')
 export class BookingController {
@@ -8,8 +11,15 @@ export class BookingController {
 
   // Create a new booking
   @Post()
-  create(@Body() createBookingDto: { date: Date; status: string; residentId: string; tradespersonId: string | null; engineerId: string | null }) {
-    return this.bookingService.create(createBookingDto.date, createBookingDto.status, createBookingDto.residentId, createBookingDto.tradespersonId, createBookingDto.engineerId);
+  create(@Body() createBookingDto: CreateBookingDto): Promise<Booking> {
+    const { date, status, residentId, tradespersonId, engineerId } = createBookingDto;
+    const bookingStatus = status as BookingStatus; // Ensure status is treated as BookingStatus
+    
+    // Convert nullable fields to undefined for optional parameters
+    const tradespersonIdSafe = tradespersonId ?? undefined;
+    const engineerIdSafe = engineerId ?? undefined;
+
+    return this.bookingService.create(date, bookingStatus, residentId, tradespersonIdSafe, engineerIdSafe);
   }
 
   // Get all bookings
@@ -26,8 +36,9 @@ export class BookingController {
 
   // Update the status of a booking (e.g., completed, canceled)
   @Put(':id/status')
-  updateStatus(@Param('id') id: string, @Body('status') status: string): Promise<Booking | null> {
-    return this.bookingService.updateStatus(id, status);
+  updateStatus(@Param('id') id: string, @Body() updateStatusDto: UpdateStatusDto): Promise<Booking | null> {
+    const bookingStatus = updateStatusDto.status as BookingStatus;
+    return this.bookingService.updateStatus(id, bookingStatus);
   }
 
   // Reschedule a booking (update the date and time)

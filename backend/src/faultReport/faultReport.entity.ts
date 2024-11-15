@@ -1,20 +1,35 @@
 // src/fault-report/fault-report.entity.ts
-import { Entity, Column, ManyToOne } from 'typeorm';
-import { Resident } from '../resident/resident.entity'; // Assuming Resident is in a separate module
-import { BaseEntity } from '../shared/base.entity'; // Import BaseEntity for the id and created_at fields
+// import { Entity, Column, ManyToOne } from 'typeorm';
+// import { Resident } from '../resident/resident.entity';
+// import { MaintenanceEngineer } from '../maintenanceEngineer/maintenanceEngineer.entity'; 
+// import { BaseEntity } from '../shared/base.entity';
 
-@Entity('fault_reports')
-export class FaultReport extends BaseEntity {  // Inherit from BaseEntity
-  @ManyToOne(() => Resident, (resident) => resident.fault_reports)
-  resident!: Resident;  // The resident who created the fault report
+// export enum FaultStatus {
+//   PENDING = 'PENDING',
+//   UNDER_REVIEW = 'UNDER_REVIEW',
+//   NEEDS_REPAIR = 'NEEDS_REPAIR',
+//   IN_PROGRESS = 'IN_PROGRESS',
+//   ESCALATED = 'ESCALATED',
+//   ON_HOLD = 'ON_HOLD',
+//   CANCELED = 'CANCELED',
+//   RESOLVED = 'RESOLVED',
+// }
 
-  @Column('text')
-  description!: string;  // Description of the fault
+// @Entity('fault_reports')
+// export class FaultReport extends BaseEntity {
+//   @ManyToOne(() => Resident, (resident) => resident.faultReport, { nullable: false })
+//   resident!: Resident;
 
-  @Column({
-    type: 'enum',
-    enum: ['PENDING', 'UNDER_REVIEW', 'NEEDS_REPAIR', 'IN_PROGRESS', 'ESCALATED', 'ON_HOLD', 'CANCELED', 'RESOLVED'],
-    default: 'PENDING',
-  })
-  status!: string;  // The current status of the fault report
+//   @ManyToOne(() => MaintenanceEngineer, (engineer) => engineer.fault_reports, { nullable: true })
+//   engineer!: MaintenanceEngineer;
 
+//   @Column('text')
+//   description!: string;
+
+//   @Column({
+//     type: 'enum',
+//     enum: FaultStatus,
+//     default: FaultStatus.PENDING,
+//   })
+//   status!: FaultStatus;
+// }

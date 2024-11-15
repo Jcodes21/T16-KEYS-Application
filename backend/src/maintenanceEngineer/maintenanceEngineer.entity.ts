@@ -1,31 +1,35 @@
-// src/maintenance-engineer/maintenance-engineer.entity.ts
-import { Entity, Column, OneToMany } from 'typeorm';
-import { FaultReport } from '../fault-report/fault-report.entity'; // Assuming fault-report.entity.ts exists
-import { BaseEntity } from '../shared/base.entity'; // Import BaseEntity
+// import { Entity, Column, OneToMany, PrimaryGeneratedColumn, BaseEntity } from 'typeorm';
+// import { FaultReport } from '../faultReport/faultReport.entity';
 
-@Entity('maintenance_engineers')
-export class MaintenanceEngineer extends BaseEntity {  // Inherit from BaseEntity
-  @Column()
-  department!: string;
+// @Entity('maintenance_engineers')
+// export class MaintenanceEngineer extends BaseEntity {
+//   @PrimaryGeneratedColumn()
+//   id!: number;
 
-  @Column()
-  qualification!: string;
+//   @Column()
+//   department!: string;
 
-  @Column({ type: 'float', nullable: true })
-  years_experience!: number;
+//   @Column()
+//   qualification!: string;
 
-  @Column()
-  company_name!: string;
+//   @Column({ type: 'float', nullable: true })
+//   years_experience!: number;
 
-  @Column({ nullable: true })
-  company_contact!: string;
+//   @Column()
+//   company_name!: string;
 
-  @Column({ type: 'float', nullable: true })
-  latitude!: number;  // Latitude for geolocation
+//   @Column({ nullable: true })
+//   company_contact!: string;
 
-  @Column({ type: 'float', nullable: true })
-  longitude!: number; // Longitude for geolocation
+//   @Column({ type: 'float', nullable: true })
+//   latitude!: number;
 
-  @OneToMany(() => FaultReport, faultReport => faultReport.engineer) // Assuming one engineer can handle many fault reports
-  fault_reports!: FaultReport[];
-}
+//   @Column({ type: 'float', nullable: true })
+//   longitude!: number;
+
+//   @Column({ type: 'boolean', default: true })
+//   available!: boolean;
+
+//   @OneToMany(() => FaultReport, faultReport => faultReport.engineer, { cascade: true })
+//   fault_reports!: FaultReport[];
+// }
